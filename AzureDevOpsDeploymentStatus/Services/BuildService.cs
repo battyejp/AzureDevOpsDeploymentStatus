@@ -31,11 +31,14 @@ namespace AzureDevOpsDeploymentStatus.Services
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
         }
 
-        public async Task<Dictionary<string, StageBuildResult>> GetBuilds()
+        public async Task<Dictionary<string, List<EnvBuildResult>>> GetEnvBuildResults()
         {
-            var results = new Dictionary<string, StageBuildResult>();
+            var results = new Dictionary<string, List<EnvBuildResult>>();
             var query = GetStartQueryString();
-            query["definitions"] = configurationService.BuildDefinitionIds;
+            //TODO sort this out
+            var defnCSV = "39,77";//configurationService.BuildDefinitionIds;
+            var defns = defnCSV.Split(',');
+            query["definitions"] = defnCSV;
             query["branchName"] = "refs/heads/master";
             query["reasonFilter"] = "individualCI";
             logger.LogInformation($"Query string {query}");
@@ -43,37 +46,66 @@ namespace AzureDevOpsDeploymentStatus.Services
             try
             {
                 var builds = await httpClient.GetFromJsonAsync<Builds>($"{configurationService.AzureDevOpsRestApiEndpointStart}?{query}");
-                var orderBuilds = builds.Value.OrderByDescending(x => x.Id).ToList();
+                var groupedBuilds = builds.Value.GroupBy(x => x.Definition.Id);
 
-                foreach (var build in orderBuilds)
+                foreach(var defn in defns)
                 {
-                    logger.LogInformation($"Build {build.BuildNumber}");
-                    var records = await httpClient.GetFromJsonAsync<Records>($"{configurationService.AzureDevOpsRestApiEndpointStart}/{build.Id}/timeline?{GetStartQueryString()}");
+                    var id = int.Parse(defn);
+                    var group = groupedBuilds.SingleOrDefault(x => x.Key == id);
 
-                    foreach (var env in configurationService.Environments)
+                    if (group == null) continue;
+
+                    var envBuildResultsForPipelineDefinition = await GetEnvBuildResultsForPipelineDefintion(group);
+                    
+                    if (envBuildResultsForPipelineDefinition.Any())
                     {
-                        if (results.ContainsKey(env)) continue;
-
-                        var stageRecord = records.RecordList.Where(x => x.Type == "Stage" && x.Name == env).ToList();
-
-                        if (stageRecord.Any()
-                            && (stageRecord.First().Result == "succeeded" ||
-                                stageRecord.First().Result == "failed"))
-                        {
-                            logger.LogInformation($"Build {build.BuildNumber} Env: {env} Result: {stageRecord.First().Result}");
-                            results.Add(env, new StageBuildResult { Build = build, Success = stageRecord.First().Result == "succeeded" });
-                        }
+                        results.Add(group.First().Definition.Name, envBuildResultsForPipelineDefinition.Values.ToList());
                     }
-
-                    if (results.Count == configurationService.Environments.Length) break;
                 }
+
                 return results;
+
             }
             catch (Exception ex)
             {
                 logger.LogError("Error occurred getting builds", ex);
-                throw ex;
+                throw;
             }
+        }
+
+        public async Task<Dictionary<string, EnvBuildResult>> GetEnvBuildResultsForPipelineDefintion(IGrouping<int, Build> buildGroupByPipelineDefinition)
+        {
+            var results = new Dictionary<string, EnvBuildResult>();
+            var orderedBuilds = buildGroupByPipelineDefinition.OrderByDescending(x => x.Id).ToList();
+
+            foreach (var build in orderedBuilds)
+            {
+                logger.LogInformation($"Build {build.BuildNumber}");
+                var records = await httpClient.GetFromJsonAsync<Records>($"{configurationService.AzureDevOpsRestApiEndpointStart}/{build.Id}/timeline?{GetStartQueryString()}");
+
+                foreach (var env in configurationService.Stages)
+                {
+                    if (results.ContainsKey(env)) continue;
+
+                    var stageRecord = records.RecordList.Where(x => x.Type == "Stage" && x.Name == env).ToList();
+
+                    if (stageRecord.Any()
+                        && (stageRecord.First().Result == "succeeded" ||
+                            stageRecord.First().Result == "failed"))
+                    {
+                        logger.LogInformation($"Build {build.BuildNumber} Env: {env} Result: {stageRecord.First().Result}");
+                        results.Add(env, new EnvBuildResult 
+                        { 
+                            Environment = env, 
+                            Build = build, 
+                            Success = stageRecord.First().Result == "succeeded" 
+                        });
+                    }
+                }
+
+                if (results.Count == configurationService.Stages.Length) break;
+            }
+            return results;
         }
 
         private NameValueCollection GetStartQueryString()

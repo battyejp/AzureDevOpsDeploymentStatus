@@ -15,6 +15,6 @@ namespace AzureDevOpsDeploymentStatus.Services.Interfaces
 
         public Dictionary<string, string> StageEnvMappings { get; set; }
 
-        public string[] Environments { get; set; }
+        public string[] Stages { get; set; }
     }
 }

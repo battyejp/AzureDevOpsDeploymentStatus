@@ -8,14 +8,15 @@ namespace AzureDevOpsDeploymentStatus.Pages
 {
     public partial class Index : ComponentBase
     {
-        private Dictionary<string, StageBuildResult> results;
+        private Dictionary<string, List<EnvBuildResult>> buildResults;
 
         [Inject]
         public IBuildService BuildService { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
-            results = await BuildService.GetBuilds();
+            buildResults = await BuildService.GetEnvBuildResults();
+
             await base.OnInitializedAsync();
         }
     }

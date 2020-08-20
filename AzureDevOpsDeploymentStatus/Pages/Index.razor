@@ -2,7 +2,7 @@
 
 <h1>Environments</h1>
 
-@if (@results == null)
+@if (@buildResults == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -11,6 +11,7 @@ else
     <table class="table table-bordered">
         <thead>
             <tr>
+                @*TODO loop through environments to for this*@
                 <th scope="col">Component</th>
                 <th scope="col">Dev</th>
                 <th scope="col">Test</th>
@@ -22,16 +23,17 @@ else
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <th scope="col">@results.First().Value.Build.Definition.Name</th>
-                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_Dev") ? results["Deploy_Dev"]: null ) />
-                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_Test") ? results["Deploy_Test"]: null ) />
-                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_SIT") ? results["Deploy_SIT"]: null ) />
-                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_UAT") ? results["Deploy_UAT"]: null ) />
-                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_NFT") ? results["Deploy_NFT"]: null ) />
-                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_PreProd") ? results["Deploy_PreProd"]: null ) />
-                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_Prod") ? results["Deploy_Prod"]: null ) />
-            </tr>
+            @foreach(var pair in buildResults)
+            { 
+                <tr>
+                    <th scope="col">@pair.Key</th>
+
+                    @foreach (var buildResult in buildResults[pair.Key])
+                    {
+                        <BuildResultTableCell EnvBuildResult=@buildResult />
+                    }
+                </tr>
+            }
         </tbody>
     </table>
 }

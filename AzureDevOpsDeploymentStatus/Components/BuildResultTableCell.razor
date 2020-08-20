@@ -1,0 +1,16 @@
+﻿@if (EnvBuildResult != null)
+{
+    <td class="@(EnvBuildResult.Success ? "bg-success" : "bg-danger")">
+        <a class="text-white" href="@EnvBuildResult.Build.Link">@EnvBuildResult.Build.Version</a>
+    </td>
+}
+else
+{
+    <td>
+    </td>
+}
+
+@code {
+    [Parameter]
+    public AzureDevOpsDeploymentStatus.Models.EnvBuildResult EnvBuildResult { get; set; }
+}

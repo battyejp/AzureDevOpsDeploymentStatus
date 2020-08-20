@@ -22,7 +22,7 @@ namespace AzureDevOpsDeploymentStatus.Services
                 StageEnvMappings.Add(section.GetValue<string>("Stage"), section.GetValue<string>("Environment"));
             }
 
-            Environments = StageEnvMappings.Keys.ToArray();
+            Stages = StageEnvMappings.Keys.ToArray();
         }
 
         public string ApiVersion { get; set; }
@@ -33,6 +33,6 @@ namespace AzureDevOpsDeploymentStatus.Services
 
         public Dictionary<string, string> StageEnvMappings { get; set; }
 
-        public string[] Environments { get; set; }
+        public string[] Stages { get; set; }
     }
 }
