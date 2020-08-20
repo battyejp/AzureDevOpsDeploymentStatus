@@ -1,7 +1,7 @@
-﻿@if (@Build != null)
+﻿@if (StageBuildResult != null)
 {
-    <td class="bg-success">
-        <a class="text-white" href="@Build.Link">@Build.Version</a>
+    <td class="@(StageBuildResult.Success ? "bg-success" : "bg-danger")">
+        <a class="text-white" href="@StageBuildResult.Build.Link">@StageBuildResult.Build.Version</a>
     </td>
 }
 else
@@ -12,5 +12,5 @@ else
 
 @code {
     [Parameter]
-    public AzureDevOpsDeploymentStatus.Models.Build Build { get; set; }
+    public AzureDevOpsDeploymentStatus.Models.StageBuildResult StageBuildResult { get; set; }
 }

@@ -8,7 +8,7 @@ namespace AzureDevOpsDeploymentStatus.Pages
 {
     public partial class Index : ComponentBase
     {
-        private Dictionary<string, Build> results;
+        private Dictionary<string, StageBuildResult> results;
 
         [Inject]
         public IBuildService BuildService { get; set; }

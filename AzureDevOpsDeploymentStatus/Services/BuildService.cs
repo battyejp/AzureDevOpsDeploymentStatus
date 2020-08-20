@@ -40,9 +40,9 @@ namespace AzureDevOpsDeploymentStatus.Services
             environments = Configuration["Environments"].Split(',');
         }
 
-        public async Task<Dictionary<string, Build>> GetBuilds()
+        public async Task<Dictionary<string, StageBuildResult>> GetBuilds()
         {
-            var results = new Dictionary<string, Build>();
+            var results = new Dictionary<string, StageBuildResult>();
             var query = GetStartQueryString();
             query["definitions"] = buildDefinitionIds;
             query["branchName"] = "refs/heads/master";
@@ -65,10 +65,12 @@ namespace AzureDevOpsDeploymentStatus.Services
 
                         var stageRecord = records.RecordList.Where(x => x.Type == "Stage" && x.Name == env).ToList();
 
-                        if (stageRecord.Any() && stageRecord.First().Result == "succeeded")
+                        if (stageRecord.Any() 
+                            && (stageRecord.First().Result == "succeeded" ||
+                                stageRecord.First().Result == "failed"))
                         {
-                            logger.LogInformation($"Build {build.BuildNumber} Env: {env}");
-                            results.Add(env, build);
+                            logger.LogInformation($"Build {build.BuildNumber} Env: {env} Result: {stageRecord.First().Result}");
+                            results.Add(env, new StageBuildResult { Build = build, Success = stageRecord.First().Result == "succeeded" });
                         }
                     }
 

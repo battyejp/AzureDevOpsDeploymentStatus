@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace AzureDevOpsDeploymentStatus.Models
 {
@@ -19,7 +20,16 @@ namespace AzureDevOpsDeploymentStatus.Models
 
         public Definition Definition { get; set; }
 
-        public string Link => $"https://dev.azure.com/IPF-International-Limited/Artemis/_build/results?buildId={Id}&view=results";
+        public Project Project { get; set; }
+
+        public string Link
+        {
+            get
+            {
+                var split = Project.Url.Split(new string[] { "_apis" }, StringSplitOptions.None);
+                return $"{split[0]}{Project.Name}/_build/results?buildId={Id}&view=results";
+            }
+        }
 
         public string Version
         {
@@ -34,5 +44,12 @@ namespace AzureDevOpsDeploymentStatus.Models
     public class Definition
     {
         public string Name { get; set; }
+    }
+
+    public class Project
+    {
+        public string Name { get; set; }
+
+        public string Url { get; set; }
     }
 }

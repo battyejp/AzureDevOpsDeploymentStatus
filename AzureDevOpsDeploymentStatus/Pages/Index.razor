@@ -23,14 +23,14 @@ else
         </thead>
         <tbody>
             <tr>
-                <th scope="col">@results.First().Value.Definition.Name</th>
-                <BuildTableCell Build=@( results.ContainsKey("Deploy_Dev") ? results["Deploy_Dev"]: null ) />
-                <BuildTableCell Build=@( results.ContainsKey("Deploy_Test") ? results["Deploy_Test"]: null ) />
-                <BuildTableCell Build=@( results.ContainsKey("Deploy_SIT") ? results["Deploy_SIT"]: null ) />
-                <BuildTableCell Build=@( results.ContainsKey("Deploy_UAT") ? results["Deploy_UAT"]: null ) />
-                <BuildTableCell Build=@( results.ContainsKey("Deploy_NFT") ? results["Deploy_NFT"]: null ) />
-                <BuildTableCell Build=@( results.ContainsKey("Deploy_PreProd") ? results["Deploy_PreProd"]: null ) />
-                <BuildTableCell Build=@( results.ContainsKey("Deploy_Prod") ? results["Deploy_Prod"]: null ) />
+                <th scope="col">@results.First().Value.Build.Definition.Name</th>
+                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_Dev") ? results["Deploy_Dev"]: null ) />
+                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_Test") ? results["Deploy_Test"]: null ) />
+                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_SIT") ? results["Deploy_SIT"]: null ) />
+                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_UAT") ? results["Deploy_UAT"]: null ) />
+                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_NFT") ? results["Deploy_NFT"]: null ) />
+                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_PreProd") ? results["Deploy_PreProd"]: null ) />
+                <BuildTableCell StageBuildResult=@( results.ContainsKey("Deploy_Prod") ? results["Deploy_Prod"]: null ) />
             </tr>
         </tbody>
     </table>

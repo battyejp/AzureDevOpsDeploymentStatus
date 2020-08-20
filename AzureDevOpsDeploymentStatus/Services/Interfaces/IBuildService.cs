@@ -6,6 +6,6 @@ namespace AzureDevOpsDeploymentStatus.Services.Interfaces
 {
     public interface IBuildService
     {
-        Task<Dictionary<string, Build>> GetBuilds();
+        Task<Dictionary<string, StageBuildResult>> GetBuilds();
     }
 }
