@@ -1,12 +1,9 @@
-using System;
-using System.Net.Http;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text;
+using AzureDevOpsDeploymentStatus.Services;
+using AzureDevOpsDeploymentStatus.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using System;
+using System.Threading.Tasks;
 
 namespace AzureDevOpsDeploymentStatus
 {
@@ -16,9 +13,11 @@ namespace AzureDevOpsDeploymentStatus
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-            builder.Services.AddScoped(sp => new HttpClient());
-            //builder.Services.AddHttpClient("ServerAPI", client => client.BaseAddress = new Uri("https://dev.azure.com"));
-            //builder.Services.AddScoped<IMyHttpClient, MyHttpClient>();
+
+            builder.Services.AddHttpClient<IBuildService, BuildService>(client =>
+            {
+                client.BaseAddress = new Uri("https://dev.azure.com/");
+            });
 
             await builder.Build().RunAsync();
         }
