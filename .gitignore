@@ -331,4 +331,4 @@ ASALocalRun/
 .vscode/
 /proxy.crt
 
-wwwroot/appseetings.Development.json
+*.Development.json
