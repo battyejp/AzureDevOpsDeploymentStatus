@@ -1,0 +1,20 @@
+﻿<div class="card mt-3">
+    <div class="card-header">
+        @Name
+    </div>
+    @if (@Build != null)
+    {
+        <div class="card-body">
+            <h5 class="card-title">@Build.Definition.Name @Build.BuildNumber</h5>
+        </div>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+
+    [Parameter]
+    public AzureDevOpsDeploymentStatus.Models.Build Build { get; set; }
+}

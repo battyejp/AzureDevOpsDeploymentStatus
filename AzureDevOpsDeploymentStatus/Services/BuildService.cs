@@ -21,6 +21,7 @@ namespace AzureDevOpsDeploymentStatus.Services
         private readonly ILogger<IBuildService> logger;
         private readonly string staticEndpoint;
         private readonly string apiVersion;
+        private readonly string buildDefinitionIds;
 
         private Builds builds;
         private string[] environments;
@@ -31,6 +32,7 @@ namespace AzureDevOpsDeploymentStatus.Services
             this.logger = logger;
             staticEndpoint = $"{Configuration["AzDOOrg"]}/{Configuration["AzDOProject"]}/_apis/build/builds";
             apiVersion = Configuration["AzDOApiVersion"];
+            buildDefinitionIds = Configuration["BuildDefinitionIds"];
 
             var byteArray = Encoding.ASCII.GetBytes($"username:{Configuration["AzDOPAT"]}");
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
@@ -38,11 +40,11 @@ namespace AzureDevOpsDeploymentStatus.Services
             environments = Configuration["Environments"].Split(',');
         }
 
-        public async Task<Dictionary<string, string>> GetBuilds(string definitions = "52")
+        public async Task<Dictionary<string, Build>> GetBuilds()
         {
-            var results = new Dictionary<string, string>();
+            var results = new Dictionary<string, Build>();
             var query = GetStartQueryString();
-            query["definitions"] = definitions;
+            query["definitions"] = buildDefinitionIds;
             query["branchName"] = "refs/heads/master";
             query["reasonFilter"] = "individualCI";
             logger.LogInformation($"Query string {query}");
@@ -66,7 +68,7 @@ namespace AzureDevOpsDeploymentStatus.Services
                         if (stageRecord.Any() && stageRecord.First().Result == "succeeded")
                         {
                             logger.LogInformation($"Build {build.BuildNumber} Env: {env}");
-                            results.Add(env, build.BuildNumber);
+                            results.Add(env, build);
                         }
                     }
 
@@ -76,7 +78,8 @@ namespace AzureDevOpsDeploymentStatus.Services
             }
             catch (Exception ex)
             {
-                return null;
+                logger.LogError("Error occurred getting builds", ex);
+                throw ex;
             }
         }
 

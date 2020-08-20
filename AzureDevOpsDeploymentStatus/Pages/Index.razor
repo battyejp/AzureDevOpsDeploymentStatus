@@ -8,25 +8,30 @@
 }
 else
 {
-    <div class="container">
-        <div class="row">
-            <div class="col-sm">
-                <AzureDevOpsDeploymentStatus.Components.Environment Name="Dev" Version=@( results.ContainsKey("Deploy_Dev") ? results["Deploy_Dev"]: string.Empty ) />
-            </div>
-            <div class="col-sm">
-                <AzureDevOpsDeploymentStatus.Components.Environment Name="Test" Version=@( results.ContainsKey("Deploy_Test") ? results["Deploy_Test"]: string.Empty ) />
-            </div>
-            <div class="col-sm">
-                <AzureDevOpsDeploymentStatus.Components.Environment Name="SIT" Version=@( results.ContainsKey("Deploy_SIT") ? results["Deploy_SIT"]: string.Empty ) />
-                <AzureDevOpsDeploymentStatus.Components.Environment Name="UAT" Version=@( results.ContainsKey("Deploy_UAT") ? results["Deploy_UAT"]: string.Empty ) />
-                <AzureDevOpsDeploymentStatus.Components.Environment Name="NFT" Version=@( results.ContainsKey("Deploy_NFT") ? results["Deploy_NFT"]: string.Empty ) />
-            </div>
-            <div class="col-sm">
-                <AzureDevOpsDeploymentStatus.Components.Environment Name="PreProd" Version=@( results.ContainsKey("Deploy_PreProd") ? results["Deploy_PreProd"]: string.Empty ) />
-            </div>
-            <div class="col-sm">
-                <AzureDevOpsDeploymentStatus.Components.Environment Name="Prod" Version=@( results.ContainsKey("Deploy_Prod") ? results["Deploy_Prod"]: string.Empty ) />
-            </div>
-        </div>
-    </div>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Component</th>
+                <th scope="col">Dev</th>
+                <th scope="col">Test</th>
+                <th scope="col">SIT</th>
+                <th scope="col">UAT</th>
+                <th scope="col">NFT</th>
+                <th scope="col">PreProd</th>
+                <th scope="col">Prod</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="col">@results.First().Value.Definition.Name</th>
+                <BuildTableCell Build=@( results.ContainsKey("Deploy_Dev") ? results["Deploy_Dev"]: null ) />
+                <BuildTableCell Build=@( results.ContainsKey("Deploy_Test") ? results["Deploy_Test"]: null ) />
+                <BuildTableCell Build=@( results.ContainsKey("Deploy_SIT") ? results["Deploy_SIT"]: null ) />
+                <BuildTableCell Build=@( results.ContainsKey("Deploy_UAT") ? results["Deploy_UAT"]: null ) />
+                <BuildTableCell Build=@( results.ContainsKey("Deploy_NFT") ? results["Deploy_NFT"]: null ) />
+                <BuildTableCell Build=@( results.ContainsKey("Deploy_PreProd") ? results["Deploy_PreProd"]: null ) />
+                <BuildTableCell Build=@( results.ContainsKey("Deploy_Prod") ? results["Deploy_Prod"]: null ) />
+            </tr>
+        </tbody>
+    </table>
 }

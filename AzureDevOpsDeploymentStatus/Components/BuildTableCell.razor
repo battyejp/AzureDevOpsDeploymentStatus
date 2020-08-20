@@ -1,0 +1,16 @@
+﻿@if (@Build != null)
+{
+    <td class="bg-success">
+        <a class="text-white" href="@Build.Link">@Build.Version</a>
+    </td>
+}
+else
+{
+    <td>
+    </td>
+}
+
+@code {
+    [Parameter]
+    public AzureDevOpsDeploymentStatus.Models.Build Build { get; set; }
+}
