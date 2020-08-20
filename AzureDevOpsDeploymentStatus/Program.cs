@@ -1,6 +1,7 @@
 using AzureDevOpsDeploymentStatus.Services;
 using AzureDevOpsDeploymentStatus.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace AzureDevOpsDeploymentStatus
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
+            builder.Services.AddSingleton<IConfigurationService, ConfigurationService>();
             builder.Services.AddHttpClient<IBuildService, BuildService>(client =>
             {
                 client.BaseAddress = new Uri("https://dev.azure.com/");

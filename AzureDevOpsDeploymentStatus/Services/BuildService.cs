@@ -19,53 +19,44 @@ namespace AzureDevOpsDeploymentStatus.Services
     {
         private readonly HttpClient httpClient;
         private readonly ILogger<IBuildService> logger;
-        private readonly string staticEndpoint;
-        private readonly string apiVersion;
-        private readonly string buildDefinitionIds;
+        private readonly IConfigurationService configurationService;
 
-        private Builds builds;
-        private string[] environments;
-
-        public BuildService(HttpClient httpClient, IConfiguration Configuration, ILogger<IBuildService> logger)
+        public BuildService(HttpClient httpClient, IConfiguration Configuration, IConfigurationService configurationService, ILogger<IBuildService> logger)
         {
             this.httpClient = httpClient;
             this.logger = logger;
-            staticEndpoint = $"{Configuration["AzDOOrg"]}/{Configuration["AzDOProject"]}/_apis/build/builds";
-            apiVersion = Configuration["AzDOApiVersion"];
-            buildDefinitionIds = Configuration["BuildDefinitionIds"];
+            this.configurationService = configurationService;
 
             var byteArray = Encoding.ASCII.GetBytes($"username:{Configuration["AzDOPAT"]}");
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-            environments = Configuration["Environments"].Split(',');
         }
 
         public async Task<Dictionary<string, StageBuildResult>> GetBuilds()
         {
             var results = new Dictionary<string, StageBuildResult>();
             var query = GetStartQueryString();
-            query["definitions"] = buildDefinitionIds;
+            query["definitions"] = configurationService.BuildDefinitionIds;
             query["branchName"] = "refs/heads/master";
             query["reasonFilter"] = "individualCI";
             logger.LogInformation($"Query string {query}");
 
             try
             {
-                builds = await httpClient.GetFromJsonAsync<Builds>($"{staticEndpoint}?{query}");
+                var builds = await httpClient.GetFromJsonAsync<Builds>($"{configurationService.AzureDevOpsRestApiEndpointStart}?{query}");
                 var orderBuilds = builds.Value.OrderByDescending(x => x.Id).ToList();
 
                 foreach (var build in orderBuilds)
                 {
                     logger.LogInformation($"Build {build.BuildNumber}");
-                    var records = await httpClient.GetFromJsonAsync<Records>($"{staticEndpoint}/{build.Id}/timeline?{GetStartQueryString()}");
+                    var records = await httpClient.GetFromJsonAsync<Records>($"{configurationService.AzureDevOpsRestApiEndpointStart}/{build.Id}/timeline?{GetStartQueryString()}");
 
-                    foreach (var env in environments)
+                    foreach (var env in configurationService.Environments)
                     {
                         if (results.ContainsKey(env)) continue;
 
                         var stageRecord = records.RecordList.Where(x => x.Type == "Stage" && x.Name == env).ToList();
 
-                        if (stageRecord.Any() 
+                        if (stageRecord.Any()
                             && (stageRecord.First().Result == "succeeded" ||
                                 stageRecord.First().Result == "failed"))
                         {
@@ -74,7 +65,7 @@ namespace AzureDevOpsDeploymentStatus.Services
                         }
                     }
 
-                    if (results.Count == environments.Length) break;
+                    if (results.Count == configurationService.Environments.Length) break;
                 }
                 return results;
             }
@@ -88,7 +79,7 @@ namespace AzureDevOpsDeploymentStatus.Services
         private NameValueCollection GetStartQueryString()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
-            query["api-version"] = apiVersion;
+           query["api-version"] = configurationService.ApiVersion;
             return query;
         }
     }
