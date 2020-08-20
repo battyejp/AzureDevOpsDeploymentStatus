@@ -1,9 +1,8 @@
 ﻿@page "/"
-@inject IBuildsHelper buildsHelper
 
 <h1>Environments</h1>
 
-@if (results == null)
+@if (@results == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -12,31 +11,22 @@ else
     <div class="container">
         <div class="row">
             <div class="col-sm">
-                <Environment Name="Dev" Version=@( results.ContainsKey("Deploy_Dev") ? results["Deploy_Dev"]: string.Empty ) />
+                <AzureDevOpsDeploymentStatus.Components.Environment Name="Dev" Version=@( results.ContainsKey("Deploy_Dev") ? results["Deploy_Dev"]: string.Empty ) />
             </div>
             <div class="col-sm">
-                <Environment Name="Test" Version=@( results.ContainsKey("Deploy_Test") ? results["Deploy_Test"]: string.Empty ) />
+                <AzureDevOpsDeploymentStatus.Components.Environment Name="Test" Version=@( results.ContainsKey("Deploy_Test") ? results["Deploy_Test"]: string.Empty ) />
             </div>
             <div class="col-sm">
-                <Environment Name="SIT" Version=@( results.ContainsKey("Deploy_SIT") ? results["Deploy_SIT"]: string.Empty ) />
-                <Environment Name="UAT" Version=@( results.ContainsKey("Deploy_UAT") ? results["Deploy_UAT"]: string.Empty ) />
-                <Environment Name="NFT" Version=@( results.ContainsKey("Deploy_NFT") ? results["Deploy_NFT"]: string.Empty ) />
+                <AzureDevOpsDeploymentStatus.Components.Environment Name="SIT" Version=@( results.ContainsKey("Deploy_SIT") ? results["Deploy_SIT"]: string.Empty ) />
+                <AzureDevOpsDeploymentStatus.Components.Environment Name="UAT" Version=@( results.ContainsKey("Deploy_UAT") ? results["Deploy_UAT"]: string.Empty ) />
+                <AzureDevOpsDeploymentStatus.Components.Environment Name="NFT" Version=@( results.ContainsKey("Deploy_NFT") ? results["Deploy_NFT"]: string.Empty ) />
             </div>
             <div class="col-sm">
-                <Environment Name="PreProd" Version=@( results.ContainsKey("Deploy_PreProd") ? results["Deploy_PreProd"]: string.Empty ) />
+                <AzureDevOpsDeploymentStatus.Components.Environment Name="PreProd" Version=@( results.ContainsKey("Deploy_PreProd") ? results["Deploy_PreProd"]: string.Empty ) />
             </div>
             <div class="col-sm">
-                <Environment Name="Prod" Version=@( results.ContainsKey("Deploy_Prod") ? results["Deploy_Prod"]: string.Empty ) />
+                <AzureDevOpsDeploymentStatus.Components.Environment Name="Prod" Version=@( results.ContainsKey("Deploy_Prod") ? results["Deploy_Prod"]: string.Empty ) />
             </div>
         </div>
     </div>
-}
-
-@code {
-    private Dictionary<string, string> results;
-
-    protected override async Task OnInitializedAsync()
-    {
-        results = await buildsHelper.GetBuilds();
-    }
 }

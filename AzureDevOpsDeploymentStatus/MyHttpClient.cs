@@ -5,13 +5,24 @@ using System.Text;
 
 namespace AzureDevOpsDeploymentStatus
 {
-    public class MyHttpClient : HttpClient
+    public interface IMyHttpClient
     {
-        public MyHttpClient(IConfiguration config)
+        string Endpoint { get; set; }
+        HttpClient HttpClient { get; }
+
+        void AddQueryParameter(string header, string value);
+    }
+
+    public class MyHttpClient : IMyHttpClient
+    {
+        public HttpClient HttpClient { get; private set; }
+
+        public MyHttpClient(HttpClient client, IConfiguration config)
         {
-            BaseAddress = new Uri("https://dev.azure.com");
+            HttpClient = client; //new HttpClient();
+            HttpClient.BaseAddress = new Uri("https://dev.azure.com");
             var byteArray = Encoding.ASCII.GetBytes($"username:{config["AzDOPAT"]}");
-            DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue
+            HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue
                 ("Basic", Convert.ToBase64String(byteArray));
         }
 

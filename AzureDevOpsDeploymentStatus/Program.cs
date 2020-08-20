@@ -16,8 +16,9 @@ namespace AzureDevOpsDeploymentStatus
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-
-            builder.Services.AddScoped<IBuildsHelper, BuildsHelper>();
+            builder.Services.AddScoped(sp => new HttpClient());
+            //builder.Services.AddHttpClient("ServerAPI", client => client.BaseAddress = new Uri("https://dev.azure.com"));
+            //builder.Services.AddScoped<IMyHttpClient, MyHttpClient>();
 
             await builder.Build().RunAsync();
         }
