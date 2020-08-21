@@ -10,6 +10,7 @@ namespace AzureDevOpsDeploymentStatus.Pages
     {
         private IDictionary<string, List<EnvBuildResult>> buildResults;
         private string[] environments;
+        private bool allDeploymentsFound;
 
         [Inject]
         public IBuildService BuildService { get; set; }
@@ -22,7 +23,7 @@ namespace AzureDevOpsDeploymentStatus.Pages
             environments = ConfigurationService.Environments;
             buildResults = new Dictionary<string, List<EnvBuildResult>>();
             await BuildService.GetEnvBuildResults(buildResults, () => { StateHasChanged(); });
-
+            allDeploymentsFound = true;
             await base.OnInitializedAsync();
         }
     }
