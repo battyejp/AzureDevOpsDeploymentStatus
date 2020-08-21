@@ -1,7 +1,7 @@
 ﻿@if (EnvBuildResult != null)
 {
     <td class="@(EnvBuildResult.Success ? "bg-success" : "bg-danger")">
-        <a class="text-white" href="@EnvBuildResult.Build.Link">@EnvBuildResult.Build.Version</a>
+        <a class="text-white" href="@EnvBuildResult.Build.Link" target="_blank">@EnvBuildResult.Build.Version</a>
     </td>
 }
 else
