@@ -8,7 +8,7 @@ namespace AzureDevOpsDeploymentStatus.Pages
 {
     public partial class Index : ComponentBase
     {
-        private Dictionary<string, List<EnvBuildResult>> buildResults;
+        private IDictionary<string, List<EnvBuildResult>> buildResults;
         private string[] environments;
 
         [Inject]
@@ -20,7 +20,8 @@ namespace AzureDevOpsDeploymentStatus.Pages
         protected override async Task OnInitializedAsync()
         {
             environments = ConfigurationService.Environments;
-            buildResults = await BuildService.GetEnvBuildResults();
+            buildResults = new Dictionary<string, List<EnvBuildResult>>();
+            await BuildService.GetEnvBuildResults(buildResults, () => { StateHasChanged(); });
 
             await base.OnInitializedAsync();
         }

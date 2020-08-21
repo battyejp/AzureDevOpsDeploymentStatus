@@ -31,9 +31,8 @@ namespace AzureDevOpsDeploymentStatus.Services
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
         }
 
-        public async Task<Dictionary<string, List<EnvBuildResult>>> GetEnvBuildResults()
+        public async Task GetEnvBuildResults(IDictionary<string, List<EnvBuildResult>> results, Action pipelineResultsFound = null)
         {
-            var results = new Dictionary<string, List<EnvBuildResult>>();
             var query = GetStartQueryString();
             var defnCSV = configurationService.BuildDefinitionIds;
             var defns = defnCSV.Split(',');
@@ -59,11 +58,11 @@ namespace AzureDevOpsDeploymentStatus.Services
                     if (envBuildResultsForPipelineDefinition.Any())
                     {
                         results.Add(group.First().Definition.Name, envBuildResultsForPipelineDefinition.Values.ToList());
+
+                        if (pipelineResultsFound != null)
+                            pipelineResultsFound();
                     }
                 }
-
-                return results;
-
             }
             catch (Exception ex)
             {
