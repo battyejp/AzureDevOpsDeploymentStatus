@@ -11,15 +11,12 @@ else
     <table class="table table-bordered">
         <thead>
             <tr>
-                @*TODO loop through environments to for this*@
                 <th scope="col">Component</th>
-                <th scope="col">Dev</th>
-                <th scope="col">Test</th>
-                <th scope="col">SIT</th>
-                <th scope="col">UAT</th>
-                <th scope="col">NFT</th>
-                <th scope="col">PreProd</th>
-                <th scope="col">Prod</th>
+
+                @foreach (var env in environments)
+                {
+                    <th scope="col">@env</th>
+                }
             </tr>
         </thead>
         <tbody>

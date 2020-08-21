@@ -35,8 +35,7 @@ namespace AzureDevOpsDeploymentStatus.Services
         {
             var results = new Dictionary<string, List<EnvBuildResult>>();
             var query = GetStartQueryString();
-            //TODO sort this out
-            var defnCSV = "39,77";//configurationService.BuildDefinitionIds;
+            var defnCSV = configurationService.BuildDefinitionIds;
             var defns = defnCSV.Split(',');
             query["definitions"] = defnCSV;
             query["branchName"] = "refs/heads/master";
